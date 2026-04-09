@@ -1,0 +1,83 @@
+type Query {
+  # Recherche de livres avec filtres optionnels
+  livres(titre: String, genre: Genre, disponible: Boolean): [Livre!]!
+
+  # Detail d'un livre avec ses relations
+  livre(id: ID!): Livre
+
+  # Liste des auteurs
+  auteurs(nom: String): [Auteur!]!
+
+  # Liste des emprunts actifs
+  empruntsActifs: [Emprunt!]!
+
+  # Detail d'un emprunt
+  emprunt(id: ID!): Emprunt
+}
+
+type Mutation {
+  # Emprunter un livre (retourne l'emprunt créé)
+  emprunterLivre(livreId: ID!, adherentId: ID!): Emprunt!
+
+  # Retourner un livre
+  retournerLivre(empruntId: ID!): Emprunt!
+
+  # Ajouter un nouveau livre (admin)
+  ajouterLivre(input: LivreInput!): Livre!
+}
+
+type Subscription {
+  # Notifier en temps reel quand un livre devient disponible
+  livreDisponible(genre: Genre): Livre!
+}
+
+type Livre {
+  id: ID!
+  titre: String!
+  isbn: String!
+  genre: Genre!
+  anneePublication: Int
+  disponible: Boolean!
+  auteur: Auteur! # relation resolue separement (DataLoader)
+  empruntsActifs: [Emprunt!]!
+}
+
+type Auteur {
+  id: ID!
+  nom: String!
+  nationalite: String
+  livres: [Livre!]! # relation inverse
+}
+
+type Emprunt {
+  id: ID!
+  dateEmprunt: String!
+  dateRetourPrevue: String!
+  dateRetourEffective: String
+  livre: Livre!
+  adherent: Adherent!
+}
+
+type Adherent {
+  id: ID!
+  nom: String!
+  email: String!
+  telephone: String
+}
+
+input LivreInput {
+  titre: String!
+  isbn: String!
+  genre: Genre!
+  auteurId: ID!
+  anneePublication: Int
+}
+
+enum Genre {
+  ROMAN
+  SCIENCE_FICTION
+  POLICIER
+  BIOGRAPHIE
+  HISTOIRE
+  SCIENCE
+}

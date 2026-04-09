@@ -1,0 +1,55 @@
+package com.bibliotheque.graphql.livre.entities;
+
+import com.bibliotheque.graphql.auteur.entities.Auteur;
+import com.bibliotheque.graphql.livre.dto.Genre;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Table(name = "livres")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Livre {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false)
+    private String titre;
+    
+    @Column(unique = true, nullable = false)
+    private String isbn;
+    
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Genre genre;
+    
+    @Column(name = "annee_publication")
+    private Integer anneePublication;
+    
+    @Column(nullable = false)
+    private Boolean disponible = true;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "auteur_id", nullable = false)
+    private Auteur auteur;
+    
+    public Long getAuteurId() {
+        return auteur != null ? auteur.getId() : null;
+    }
+}
