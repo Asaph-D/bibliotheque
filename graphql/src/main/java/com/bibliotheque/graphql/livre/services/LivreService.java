@@ -1,13 +1,15 @@
 package com.bibliotheque.graphql.livre.services;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.bibliotheque.graphql.livre.dto.Genre;
 import com.bibliotheque.graphql.livre.entities.Livre;
 import com.bibliotheque.graphql.livre.repositories.LivreRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class LivreService {
@@ -15,6 +17,7 @@ public class LivreService {
     @Autowired
     private LivreRepository livreRepository;
     
+    @Transactional
     public List<Livre> rechercher(String titre, Genre genre, Boolean disponible) {
         List<Livre> livres = livreRepository.findAll();
         
@@ -41,6 +44,18 @@ public class LivreService {
     
     public Optional<Livre> findById(Long id) {
         return livreRepository.findById(id);
+    }
+    
+    @Transactional
+    public List<Livre> findAll() {
+        return livreRepository.findAll();
+    }
+    
+    @Transactional
+    public List<Livre> findByGenreAndDisponible(Genre genre, Boolean disponible) {
+        return livreRepository.findAll().stream()
+                .filter(l -> l.getGenre() == genre && l.getDisponible().equals(disponible))
+                .toList();
     }
     
     public Livre save(Livre livre) {

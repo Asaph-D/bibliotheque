@@ -46,7 +46,6 @@ type Auteur {
   id: ID!
   nom: String!
   nationalite: String
-  livres: [Livre!]! # relation inverse
 }
 
 type Emprunt {

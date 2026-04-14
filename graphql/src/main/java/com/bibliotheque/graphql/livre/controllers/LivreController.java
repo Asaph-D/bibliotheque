@@ -11,6 +11,7 @@ import org.springframework.graphql.data.method.annotation.SubscriptionMapping;
 import org.springframework.stereotype.Controller;
 
 import com.bibliotheque.graphql.emprunt.entities.Emprunt;
+import com.bibliotheque.graphql.emprunt.repositories.EmpruntRepository;
 import com.bibliotheque.graphql.emprunt.services.EmpruntService;
 import com.bibliotheque.graphql.livre.dto.Genre;
 import com.bibliotheque.graphql.livre.entities.Livre;
@@ -27,6 +28,9 @@ public class LivreController {
 
     @Autowired
     private EmpruntService empruntService;
+
+    @Autowired
+    private EmpruntRepository empruntRepository;
 
     // === QUERIES ===
     @QueryMapping
@@ -68,7 +72,16 @@ public class LivreController {
 
     @SubscriptionMapping
     public Flux<Livre> livreDisponible(@Argument Genre genre) {
-        return livreDisponibleSink.asFlux()
-                .filter(l -> genre == null || l.getGenre() == genre);
+        // Initialiser avec les livres disponibles du genre
+        List<Livre> livresInitiaux = genre == null ? 
+            livreService.findAll() : 
+            livreService.findByGenreAndDisponible(genre, true);
+        
+        Flux<Livre> initial = Flux.fromIterable(livresInitiaux);
+        
+        return initial.concatWith(
+            livreDisponibleSink.asFlux()
+                .filter(l -> genre == null || l.getGenre() == genre)
+        );
     }
 }
