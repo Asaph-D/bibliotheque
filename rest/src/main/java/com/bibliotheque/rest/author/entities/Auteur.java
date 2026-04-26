@@ -3,6 +3,8 @@ package com.bibliotheque.rest.author.entities;
 import java.util.List;
 
 import com.bibliotheque.rest.livre.entities.Livre;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,6 +23,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true, value = {"hibernateLazyInitializer", "handler"})
 public class Auteur {
     
     @Id
@@ -33,6 +36,7 @@ public class Auteur {
     @Column
     private String nationalite;
     
+    @JsonIgnore
     @OneToMany(mappedBy = "auteur", fetch = FetchType.LAZY)
     private List<Livre> livres;
 }

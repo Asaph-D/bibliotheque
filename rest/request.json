@@ -1,0 +1,27 @@
+# Base URL REST (module rest)
+http://localhost:8081
+
+# 1) Liste / recherche de livres (équivalent Query 1)
+# GET /api/livres?titre=&genre=&disponible=
+GET http://localhost:8081/api/livres
+GET http://localhost:8081/api/livres?genre=FICTION&disponible=true
+
+# curl (PowerShell/Windows)
+curl.exe -i "http://localhost:8081/api/livres"
+curl.exe -i "http://localhost:8081/api/livres?genre=FICTION&disponible=true"
+
+# 2) Détail d'un livre
+GET http://localhost:8081/api/livres/1
+curl.exe -i "http://localhost:8081/api/livres/1"
+
+# 3) Emprunter un livre (mutation)
+# POST /api/livres/{livreId}/emprunter?adherentId={adherentId}
+POST http://localhost:8081/api/livres/4/emprunter?adherentId=1
+curl.exe -i -X POST "http://localhost:8081/api/livres/4/emprunter?adherentId=1"
+
+# 4) Retourner un livre
+# PUT /api/livres/emprunts/{empruntId}/retourner
+PUT http://localhost:8081/api/livres/emprunts/26/retourner
+curl.exe -i -X PUT "http://localhost:8081/api/livres/emprunts/26/retourner"
+
+# Note: la "subscription" GraphQL n'a pas d'équivalent REST direct (polling/SSE/WebSocket).

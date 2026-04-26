@@ -1,0 +1,39 @@
+## GraphiQL
+# http://localhost:8080/graphiql
+
+# Requête 1 : seulement titre + disponibilite (evite l'over-fetching)
+query {
+  livres(genre: ROMAN, disponible: true) {
+    id
+    titre
+    disponible
+  }
+}
+
+# Requête 2 : titre + auteur en une seule requête (evite l'under-fetching)
+query {
+  livres {
+    titre
+    auteur { nom nationalite }
+    empruntsActifs { dateRetourPrevue adherent { nom } }
+  }
+}
+
+# Mutation : emprunter un livre
+mutation {
+  emprunterLivre(livreId: "1", adherentId: "42") {
+    id
+    dateRetourPrevue
+    livre { titre }
+  }
+}
+
+# Subscription (depuis un onglet separé dans GraphiQL)
+subscription {
+  livreDisponible(genre: ROMAN) {
+    titre
+    auteur { nom }
+  }
+}
+# Puis effectuez un retour de livre pour voir la notification en temps reel
+

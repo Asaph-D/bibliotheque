@@ -2,6 +2,7 @@ package com.bibliotheque.rest.livre.entities;
 
 import com.bibliotheque.rest.author.entities.Auteur;
 import com.bibliotheque.rest.livre.dto.Genre;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,6 +24,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true, value = {"hibernateLazyInitializer", "handler"})
 public class Livre {
     
     @Id
@@ -45,7 +47,7 @@ public class Livre {
     @Column(nullable = false)
     private Boolean disponible = true;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "auteur_id", nullable = false)
     private Auteur auteur;
     

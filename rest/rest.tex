@@ -1,0 +1,116 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{hyperref}
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  frame=single
+}
+
+\title{Partie REST --- Bibliothèque}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Base URL et endpoints testés}
+Le module REST expose ses routes sur :
+\begin{lstlisting}
+http://localhost:8081
+\end{lstlisting}
+
+Les appels à utiliser (Thunder Client / curl) sont listés dans le fichier :
+\begin{lstlisting}
+rest/request.json
+\end{lstlisting}
+
+\section{Comment les requêtes sont récupérées (pipeline)}
+Pour chaque appel HTTP entrant, le chemin d'exécution est :
+\begin{lstlisting}
+HTTP -> Controller (@RestController) -> Service (@Service) -> Repository (Spring Data JPA) -> SQL (PostgreSQL)
+\end{lstlisting}
+
+\paragraph{Important.}
+Dans ce document, \textbf{appel interne} = \textbf{appel Java} à un repository/service (méthode Spring Data),
+car c'est ce qui structure concrètement le nombre d'opérations nécessaires pour fabriquer la réponse.
+
+\section{Nombre exact d'appels internes par endpoint}
+Les chiffres ci-dessous proviennent directement du code (appels repository effectués) :
+
+\subsection{GET \texttt{/api/livres} (liste/recherche)}
+\textbf{Objectif.} Récupérer des livres et éventuellement filtrer par \texttt{titre}, \texttt{genre}, \texttt{disponible}.
+
+\textbf{Chemin code.} \texttt{LivreController.getLivres} $\rightarrow$ \texttt{LivreService.rechercher}.
+
+\textbf{Appels internes exacts.}
+\begin{itemize}
+  \item \textbf{1 appel repository} : \texttt{livreRepository.findAll()}
+  \item Les filtres \texttt{titre/genre/disponible} sont ensuite appliqués \textbf{en mémoire} (streams Java), donc \textbf{0 appel interne supplémentaire}.
+\end{itemize}
+
+\textbf{Conséquence.} Même avec des paramètres de filtre, le serveur charge d'abord \textbf{tous} les livres, puis filtre côté Java.
+
+\subsection{GET \texttt{/api/livres/\{id\}} (détail)}
+\textbf{Chemin code.} \texttt{LivreController.getLivre} $\rightarrow$ \texttt{LivreService.findById}.
+
+\textbf{Appels internes exacts.}
+\begin{itemize}
+  \item \textbf{1 appel repository} : \texttt{livreRepository.findById(id)}
+\end{itemize}
+
+\subsection{POST \texttt{/api/livres/\{livreId\}/emprunter?adherentId=...}}
+\textbf{Objectif.} Créer un emprunt, marquer le livre indisponible.
+
+\textbf{Chemin code.} \texttt{LivreController.emprunterLivre} $\rightarrow$ \texttt{EmpruntService.emprunter}.
+
+\textbf{Appels internes exacts.}
+\begin{itemize}
+  \item \textbf{1} : \texttt{livreRepository.findById(livreId)}
+  \item \textbf{1} : \texttt{adherentRepository.findById(adherentId)}
+  \item \textbf{(appel service)} : \texttt{livreService.markAsUnavailable(livreId)} qui fait :
+    \begin{itemize}
+      \item \textbf{1} : \texttt{livreRepository.findById(livreId)}
+      \item \textbf{1} : \texttt{livreRepository.save(livre)}
+    \end{itemize}
+  \item \textbf{1} : \texttt{empruntRepository.save(emprunt)}
+\end{itemize}
+
+\textbf{Total exact} : \textbf{5 appels internes} (2 lectures + 1 lecture + 1 écriture + 1 écriture).
+
+\subsection{PUT \texttt{/api/livres/emprunts/\{empruntId\}/retourner}}
+\textbf{Objectif.} Clôturer un emprunt, marquer le livre disponible.
+
+\textbf{Chemin code.} \texttt{LivreController.retournerLivre} $\rightarrow$ \texttt{EmpruntService.retourner}.
+
+\textbf{Appels internes exacts.}
+\begin{itemize}
+  \item \textbf{1} : \texttt{empruntRepository.findById(empruntId)}
+  \item \textbf{(appel service)} : \texttt{livreService.markAsAvailable(livreId)} qui fait :
+    \begin{itemize}
+      \item \textbf{1} : \texttt{livreRepository.findById(livreId)}
+      \item \textbf{1} : \texttt{livreRepository.save(livre)}
+    \end{itemize}
+  \item \textbf{1} : \texttt{empruntRepository.save(emprunt)}
+\end{itemize}
+
+\textbf{Total exact} : \textbf{4 appels internes}.
+
+\section{Nombre d'appels HTTP nécessaires pour ``composer'' une donnée (comparaison avec GraphQL)}
+\subsection{Cas ``Query 1'' (liste filtrée)}
+\textbf{REST} : \textbf{1 seul appel HTTP} (\texttt{GET /api/livres?genre=...&disponible=true}).
+
+\subsection{Cas ``Query 2'' (livres + auteur + emprunts actifs)}
+En GraphQL, tout est renvoyé en \textbf{1 requête}. En REST, avec les endpoints présents :
+\begin{itemize}
+  \item \textbf{1 appel HTTP} pour la liste : \texttt{GET /api/livres}
+  \item \textbf{Les emprunts actifs} ne sont \textbf{pas exposés} par un endpoint REST de lecture dans ce module (il existe seulement \texttt{POST emprunter} et \texttt{PUT retourner}).
+\end{itemize}
+Donc, \textbf{la donnée complète de la Query 2 n'est pas reconstructible en REST} avec les routes actuelles.
+
+\end{document}
+
