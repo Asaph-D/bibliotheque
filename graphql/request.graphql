@@ -1,34 +1,40 @@
 ## GraphiQL
 # http://localhost:8080/graphiql
 
-# Requête 1 : seulement titre + disponibilite (evite l'over-fetching)
-query {
-  livres(genre: ROMAN, disponible: true) {
-    id
-    titre
-    disponible
-  }
+# [1] OVER-FETCHING (GraphQL)
+# Ici, GraphQL peut aussi "over-fetch" si le client demande trop de champs.
+# OVER-FETCHING
+query { 
+  livres(genre: ROMAN, disponible: true) { 
+    id 
+    titre 
+    disponible 
+  } 
 }
 
-# Requête 2 : titre + auteur en une seule requête (evite l'under-fetching)
-query {
-  livres {
-    titre
-    auteur { nom nationalite }
-    empruntsActifs { dateRetourPrevue adherent { nom } }
-  }
-}
+# [2] UNDER-FETCHING (GraphQL)
+# Exemple agrégé: tout en 1 requête (évite les multi-appels REST).
+# UNDER-FETCHING
+query { 
+  livres { 
+    titre 
+    auteur { nom nationalite } 
+    empruntsActifs { dateRetourPrevue adherent { nom } } 
+  } 
+} 
 
-# Mutation : emprunter un livre
+# [3] MUTATION (GraphQL) — emprunter un livre
+# MUTATION
 mutation {
-  emprunterLivre(livreId: "1", adherentId: "42") {
+  emprunterLivre(livreId: "1", adherentId: "10") {
     id
     dateRetourPrevue
     livre { titre }
   }
 }
 
-# Subscription (depuis un onglet separé dans GraphiQL)
+# [4] SUBSCRIPTION (GraphQL)
+# SUBSCRIPTION
 subscription {
   livreDisponible(genre: ROMAN) {
     titre

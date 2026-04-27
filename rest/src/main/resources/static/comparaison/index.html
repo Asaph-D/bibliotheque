@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>REST vs GraphQL — Comparaison</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,200..700,0..1,-50..200"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+      /* Sécurité: l'attribut HTML "hidden" doit vraiment cacher le labo. */
+      .drawer[hidden],
+      .drawerBackdrop[hidden] {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg">
+      <header class="top">
+        <div class="top__left">
+          <div class="kicker">COMPARAISON MONITORING EN TEMPS RÉEL</div>
+          <div class="title">
+            <span class="title__rest">REST</span>
+            <span class="title__vs">VS</span>
+            <span class="title__gql">GRAPHQL</span>
+          </div>
+          <div class="subtitle">Bibliothèque API — Spring Boot 3 + Spring for GraphQL</div>
+        </div>
+
+        <div class="actions">
+          <button class="iconBtn" id="openLab" title="Ouvrir le labo (requêtes interactives)">
+            <span class="material-symbols-outlined">science</span>
+          </button>
+          <div class="pill" id="livePill" aria-live="polite">
+            <span class="dot" id="liveDot"></span>
+            <span id="liveText">EN DIRECT</span>
+          </div>
+        </div>
+      </header>
+
+      <main class="grid">
+        <!-- REST -->
+        <section class="card card--rest">
+          <div class="card__head">
+            <div class="badge badge--rest">REST</div>
+            <div class="endpoint">
+              <div class="endpoint__method">GET</div>
+              <div class="endpoint__path" id="restEndpointLabel">/api/livres</div>
+              <div class="endpoint__hint" id="restHint">Récupère tous les champs</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel__title">
+              EXEMPLE DE RÉPONSE (JSON)
+              <span class="muted" id="restFieldsMeta">—</span>
+            </div>
+            <pre class="code" id="restJson">Clique sur le labo pour exécuter des requêtes.</pre>
+          </div>
+
+          <div class="stats">
+            <div class="stat">
+              <div class="stat__label">TAILLE RÉPONSE</div>
+              <div class="stat__value" id="restSize">—</div>
+              <div class="stat__meta" id="restSizeMeta">—</div>
+            </div>
+            <div class="stat">
+              <div class="stat__label">TEMPS RÉPONSE</div>
+              <div class="stat__value" id="restTime">—</div>
+              <div class="stat__meta" id="restHttpCalls">—</div>
+            </div>
+            <div class="stat">
+              <div class="stat__label">REQUÊTES DB</div>
+              <div class="stat__value" id="restDb">—</div>
+              <div class="stat__meta" id="restInternal">—</div>
+            </div>
+          </div>
+
+          <div class="callout callout--rest" id="restCallout">
+            <span class="material-symbols-outlined" id="restCalloutIcon">error</span>
+            <div>
+              <div class="callout__title" id="restCalloutTitle">—</div>
+              <div class="callout__desc" id="restCalloutDesc">—</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- CENTER COMPARISON -->
+        <section class="compare">
+          <div class="compare__title">COMPARAISON SELON LES BAREMES</div>
+
+          <div class="table">
+            <div class="row head">
+              <div></div>
+              <div class="col rest">REST</div>
+              <div class="col gql">GRAPHQL</div>
+            </div>
+
+            <div class="row">
+              <div class="metric">
+                <span class="material-symbols-outlined">database</span>
+                <span>DONNÉES TRANSFÉRÉES</span>
+              </div>
+              <div class="cell rest">
+                <div class="big" id="restSize2">—</div>
+                <div class="small" id="restSizeTag">—</div>
+              </div>
+              <div class="cell gql">
+                <div class="big" id="gqlSize2">—</div>
+                <div class="small" id="gqlSizeTag">—</div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="metric">
+                <span class="material-symbols-outlined">schedule</span>
+                <span>TEMPS DE RÉPONSE</span>
+              </div>
+              <div class="cell rest">
+                <div class="big" id="restTime2">—</div>
+                <div class="small" id="restTimeTag">—</div>
+              </div>
+              <div class="cell gql">
+                <div class="big" id="gqlTime2">—</div>
+                <div class="small" id="gqlTimeTag">—</div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="metric">
+                <span class="material-symbols-outlined">call_split</span>
+                <span>NOMBRE DE REQUÊTES HTTP</span>
+              </div>
+              <div class="cell rest">
+                <div class="big" id="restHttpTotal">—</div>
+                <div class="small" id="restHttpTag">—</div>
+              </div>
+              <div class="cell gql">
+                <div class="big" id="gqlHttpTotal">—</div>
+                <div class="small" id="gqlHttpTag">—</div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="metric">
+                <span class="material-symbols-outlined">lan</span>
+                <span>REQUÊTES BASE DE DONNÉES</span>
+              </div>
+              <div class="cell rest">
+                <div class="big" id="restDb2">—</div>
+                <div class="small" id="restDbTag">—</div>
+              </div>
+              <div class="cell gql">
+                <div class="big" id="gqlDb2">—</div>
+                <div class="small" id="gqlDbTag">—</div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="metric">
+                <span class="material-symbols-outlined">tune</span>
+                <span>FLEXIBILITÉ</span>
+              </div>
+              <div class="cell rest">
+                <div class="big">Faible</div>
+                <div class="small">Fixe</div>
+              </div>
+              <div class="cell gql">
+                <div class="big">Élevée</div>
+                <div class="small">Sélection de champs</div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="metric">
+                <span class="material-symbols-outlined">bolt</span>
+                <span>TEMPS RÉEL</span>
+              </div>
+              <div class="cell rest">
+                <div class="big">Non</div>
+                <div class="small">Polling requis</div>
+              </div>
+              <div class="cell gql">
+                <div class="big">Oui</div>
+                <div class="small">Subscriptions</div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="metric">
+                <span class="material-symbols-outlined">edit_square</span>
+                <span>MUTATIONS</span>
+              </div>
+              <div class="cell rest">
+                <div class="big">POST/PUT/DELETE</div>
+                <div class="small">Multiples endpoints</div>
+              </div>
+              <div class="cell gql">
+                <div class="big">Natives</div>
+                <div class="small">Type-safe</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- GRAPHQL -->
+        <section class="card card--gql">
+          <div class="card__head">
+            <div class="badge badge--gql">GRAPHQL</div>
+            <div class="endpoint">
+              <div class="endpoint__method">GraphQL</div>
+              <div class="endpoint__path" id="gqlEndpointLabel">/graphql</div>
+              <div class="endpoint__hint" id="gqlHint">Sélectionne uniquement les champs nécessaires</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel__title">EXEMPLE DE REQUÊTE</div>
+            <pre class="code" id="gqlQuery">Clique sur le labo pour exécuter des requêtes.</pre>
+            <div class="panel__title panel__title--gap">
+              RÉPONSE (JSON)
+              <span class="muted" id="gqlFieldsMeta">—</span>
+            </div>
+            <pre class="code" id="gqlJson">—</pre>
+          </div>
+
+          <div class="stats">
+            <div class="stat">
+              <div class="stat__label">TAILLE RÉPONSE</div>
+              <div class="stat__value" id="gqlSize">—</div>
+              <div class="stat__meta" id="gqlSizeMeta">—</div>
+            </div>
+            <div class="stat">
+              <div class="stat__label">TEMPS RÉPONSE</div>
+              <div class="stat__value" id="gqlTime">—</div>
+              <div class="stat__meta" id="gqlHttpCalls">—</div>
+            </div>
+            <div class="stat">
+              <div class="stat__label">REQUÊTES DB</div>
+              <div class="stat__value" id="gqlDb">—</div>
+              <div class="stat__meta" id="gqlInternal">—</div>
+            </div>
+          </div>
+
+          <div class="callout callout--gql" id="gqlCallout">
+            <span class="material-symbols-outlined" id="gqlCalloutIcon">check_circle</span>
+            <div>
+              <div class="callout__title" id="gqlCalloutTitle">—</div>
+              <div class="callout__desc" id="gqlCalloutDesc">—</div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <section class="monitor">
+        <div class="monitor__head">
+          <div class="monitor__title">MONITORING TEMPS RÉEL — SUBSCRIPTIONS GRAPHQL</div>
+          <div class="monitor__status">
+            <div class="status">
+              <div class="status__label">ABONNEMENT ACTIF</div>
+              <div class="status__value" id="subName">livreDisponible(genre: ROMAN)</div>
+            </div>
+            <div class="status">
+              <div class="status__label">WebSocket</div>
+              <div class="status__value">/graphql-ws</div>
+            </div>
+            <div class="status">
+              <div class="status__label">Statut</div>
+              <div class="status__value status__value--ok" id="wsStatus">Connexion…</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline" id="timeline"></div>
+
+        <div class="tip">
+          <span class="material-symbols-outlined">info</span>
+          <div id="tipText">
+            TIP : les tailles/temps affichés sont calculés sur les vraies réponses HTTP. Les compteurs DB/appels internes
+            proviennent des headers <span class="mono">X-Db-Statements</span> et <span class="mono">X-Internal-Calls</span>.
+          </div>
+        </div>
+      </section>
+
+      <!-- LAB (drawer) -->
+      <div class="drawerBackdrop" id="drawerBackdrop" hidden></div>
+      <aside class="drawer" id="drawer" hidden>
+        <div class="drawer__head">
+          <div class="drawer__title">
+            <span class="material-symbols-outlined">science</span>
+            Labo — requêtes interactives
+          </div>
+          <button class="iconBtn" id="closeLab" title="Fermer">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <div class="drawer__body">
+          <div class="labGrid">
+            <div class="labBlock labBlock--rest">
+              <div class="labBlock__title">REST</div>
+              <label class="labLabel">
+                Requêtes (depuis <span class="mono">rest/request.json</span>)
+                <select class="labSelect" id="restPresetSelect">
+                  <option value="">Chargement…</option>
+                </select>
+              </label>
+              <label class="labLabel">
+                URL
+                <input class="labInput" id="restUrlInput" />
+              </label>
+              <label class="labLabel">
+                Méthode
+                <select class="labSelect" id="restMethodInput">
+                  <option>GET</option>
+                  <option>POST</option>
+                  <option>PUT</option>
+                  <option>DELETE</option>
+                </select>
+              </label>
+              <label class="labLabel">
+                Body (JSON)
+                <textarea class="labTextarea" id="restBodyInput" rows="6"></textarea>
+              </label>
+              <button class="labBtn" id="runRestBtn">
+                <span class="material-symbols-outlined">play_arrow</span>
+                Exécuter REST
+              </button>
+            </div>
+
+            <div class="labBlock labBlock--gql">
+              <div class="labBlock__title">GraphQL</div>
+              <label class="labLabel">
+                Requêtes (depuis <span class="mono">graphql/request.graphql</span>)
+                <select class="labSelect" id="gqlPresetSelect">
+                  <option value="">Chargement…</option>
+                </select>
+              </label>
+              <label class="labLabel">
+                Endpoint HTTP
+                <input class="labInput" id="gqlHttpInput" />
+              </label>
+              <label class="labLabel">
+                Requête (query/mutation)
+                <textarea class="labTextarea" id="gqlQueryInput" rows="10"></textarea>
+              </label>
+              <button class="labBtn labBtn--gql" id="runGqlBtn">
+                <span class="material-symbols-outlined">play_arrow</span>
+                Exécuter GraphQL
+              </button>
+            </div>
+          </div>
+
+          <div class="agg">
+            <div class="agg__title">Espace agrégé (comparaison under/over fetching)</div>
+            <div class="agg__desc">
+              Scénario : <span class="mono">livres</span> + <span class="mono">auteur</span> + <span class="mono">empruntsActifs</span>.
+              La version REST exécute plusieurs appels HTTP et calcule le total (vrai).
+            </div>
+
+            <div class="agg__actions">
+              <button class="labBtn" id="runAggRestBtn">
+                <span class="material-symbols-outlined">account_tree</span>
+                Exécuter agrégé (REST)
+              </button>
+              <button class="labBtn labBtn--gql" id="runAggGqlBtn">
+                <span class="material-symbols-outlined">account_tree</span>
+                Exécuter agrégé (GraphQL)
+              </button>
+            </div>
+
+            <pre class="code code--wide" id="aggOutput">—</pre>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- cache-bust: éviter que le navigateur garde un ancien app.js -->
+    <script src="./app.js?v=20260427-0902" defer></script>
+  </body>
+</html>
+

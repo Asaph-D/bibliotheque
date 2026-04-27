@@ -1,0 +1,466 @@
+
+\documentclass[12pt,a4paper]{article}
+
+% Packages de base
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{tcolorbox}
+\usepackage{hyperref}
+\usepackage{float}
+\usepackage{multirow}
+\usepackage{colortbl}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{wrapfig}
+\usepackage{listings}
+
+% Code listings (utilisé par les annexes REST/GraphQL)
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  frame=single
+}
+
+% Configuration de la page
+\geometry{margin=2.5cm}
+
+% Couleurs personnalisées
+\definecolor{primaryblue}{RGB}{41,65,114}
+\definecolor{accentgreen}{RGB}{46,125,50}
+\definecolor{lightgray}{RGB}{245,245,245}
+\definecolor{tableheader}{RGB}{63,81,181}
+\definecolor{tableodd}{RGB}{232,234,246}
+\definecolor{tableeven}{RGB}{255,255,255}
+\definecolor{restcolor}{RGB}{33,150,243}
+\definecolor{graphqlcolor}{RGB}{233,30,99}
+\definecolor{warmbg}{RGB}{255,248,225}
+
+% Configuration des liens
+\hypersetup{
+    colorlinks=true,
+    linkcolor=primaryblue,
+    urlcolor=primaryblue,
+    citecolor=primaryblue,
+    pdftitle={Rapport  : API GraphQL Bibliothèque },
+    pdfauthor={Document Technique}
+}
+
+% En-tête et pied de page
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textcolor{primaryblue}{Rapport Technique -- API GraphQL Bibliothèque}}
+\fancyhead[R]{\small\textcolor{primaryblue}{\thepage}}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{primaryblue}\leaders\hrule height \headrulewidth\hfill}}
+
+% Style des sections
+\titleformat{\section}
+  {\normalfont\Large\bfseries\color{primaryblue}}
+  {\thesection}{1em}{}
+\titleformat{\subsection}
+  {\normalfont\large\bfseries\color{primaryblue}}
+  {\thesubsection}{1em}{}
+\titleformat{\subsubsection}
+  {\normalfont\normalsize\bfseries\color{accentgreen}}
+  {\thesubsubsection}{1em}{}
+
+% Boîtes d'information
+\tcbuselibrary{skins,breakable}
+\newtcolorbox{analogybox}[1][]{
+    colback=lightgray,
+    colframe=accentgreen,
+    fonttitle=\bfseries,
+    title={Analogie de la vie réelle},
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    colback=blue!5,
+    colframe=primaryblue,
+    fonttitle=\bfseries,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    colback=orange!5,
+    colframe=orange!80!black,
+    fonttitle=\bfseries,
+    breakable,
+    #1
+}
+
+\newtcolorbox{restbox}[1][]{
+    colback=cyan!5,
+    colframe=restcolor,
+    fonttitle=\bfseries\color{white},
+    colbacktitle=restcolor,
+    breakable,
+    #1
+}
+
+\newtcolorbox{graphqlbox}[1][]{
+    colback=pink!5,
+    colframe=graphqlcolor,
+    fonttitle=\bfseries\color{white},
+    colbacktitle=graphqlcolor,
+    breakable,
+    #1
+}
+
+% Style des tableaux
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+
+\begin{document}
+
+% ========================
+% PAGE DE TITRE
+% ========================
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+
+    {\Huge\bfseries\textcolor{primaryblue}{Rapport}\par}
+    \vspace{0.5cm}
+    {\Huge\bfseries\textcolor{primaryblue}{API GraphQL Bibliothèque}\par}
+ 
+    \vspace{1.5cm}
+
+    \begin{tcolorbox}[
+        colback=lightgray,
+        colframe=primaryblue,
+        width=0.85\textwidth,
+        arc=3mm,
+        boxrule=1pt
+    ]
+    \centering
+    \large
+    Objectif : Développer une API GraphQL complète pour une bibliothèque : livres, 
+    auteurs, emprunts. Illustrer la resolution du probleme d'over-fetching et d'under-
+    fetching de REST, les mutations et les subscriptions temps reel.
+    \end{tcolorbox}
+
+    \vspace{2cm}
+
+    \begin{tabular}{ll}
+        \textbf{Domaine :} & Intergiciel des applications web\\[0.3cm]
+        \textbf{Thématique :} & Interfaces de Programmation (API) \\[0.3cm]
+        \textbf{Technologies :} & Spring Boot 3 + Spring for GraphQL + RESTAPI  \\[0.3cm]
+        \textbf{Date :} & 21 avril 2026
+    \end{tabular}
+\end{titlepage}
+
+% ========================
+% TABLE DES MATIÈRES
+% ========================
+\tableofcontents
+\newpage
+\section{Introduction}
+\begin{infobox}[title={Problématique centrale}]
+Ce rapport se concentre sur une comparaison \textbf{concrète} entre REST et GraphQL sur un \textbf{même jeu de données}, en mettant en exergue comment \textbf{GraphQL résout les deux limitations majeures de REST} : l'\textbf{over-fetching} (recevoir trop de données) et l'\textbf{under-fetching} (effectuer plusieurs requêtes pour assembler les données).
+\end{infobox}
+% ========================
+% INTRODUCTION BREVE
+% ========================
+\newpage
+
+
+Une \textbf{API} (\textit{Application Programming Interface}) est une interface permettant à deux systèmes informatiques de communiquer. Dans l'architecture moderne, les API relient microservices, applications frontales et systèmes tiers.
+
+% ========================
+% PARTIE 1 : REST BREF RESUME
+% ========================
+\section{Les API REST}
+
+\textbf{REST} (\textit{Representational State Transfer}) est un style architectural où chaque ressource est accessible via une \textbf{URI} unique et manipulée par les verbes HTTP (GET, POST, PUT, DELETE). Les réponses sont généralement au format JSON.
+
+
+
+\begin{warningbox}[title={Les deux failles structurelles de REST}]
+\begin{enumerate}[leftmargin=1.5cm]
+    \item \textbf{Over-fetching} : le client reçoit systématiquement \textbf{l'intégralité de la ressource}, même s'il n'a besoin que de quelques champs. Cela gaspille la bande passante et la mémoire.
+
+    \item \textbf{Under-fetching} : pour obtenir des données liées (ex: un livre + son auteur + ses emprunts), le client doit effectuer \textbf{plusieurs requêtes successives} (problème N+1), multipliant la latence réseau.
+\end{enumerate}
+\end{warningbox}
+
+% ========================
+% ANNEXE REST (ENDPOINTS + METRIQUES)
+% ========================
+\input{rest/rest}
+
+% ========================
+% PARTIE 2 : GRAPHQL EN DETAIL
+% ========================
+\section{GraphQL : La Solution aux Limitations de REST}
+
+\subsection{Qu'est-ce que GraphQL ?}
+
+\textbf{GraphQL} est un \textbf{langage de requête} pour les API développé par Facebook (Meta) en 2012, rendu public en 2015. Contrairement à REST, ce n'est pas un style architectural mais un \textbf{langage déclaratif} permettant au client de spécifier \textbf{exactement} quelles données il souhaite recevoir.
+
+
+\subsection{Comment GraphQL élimine l'Over-fetching}
+
+\begin{infobox}[title={Définition : Over-fetching}]
+L'\textbf{over-fetching} se produit lorsqu'une API retourne plus de données que le client n'en a besoin. Avec REST, si vous appelez \texttt{GET /livres/123}, vous recevez l'intégralité de l'objet livre (titre, isbn, résumé, année, nombre de pages, éditeur, langue, couverture...) même si vous n'affichez que le titre et l'auteur.
+\end{infobox}
+
+\subsubsection{Mécanisme de GraphQL}
+
+Dans GraphQL, le client \textbf{déclare explicitement} chaque champ souhaité dans sa requête. Le serveur ne retourne \textbf{jamais} un champ non demandé.
+
+\begin{analogybox}
+Imaginez que vous consultez le \textbf{catalogue d'une bibliothèque} :
+\begin{itemize}
+    \item \textbf{REST} = le bibliothécaire vous donne la fiche complète du livre (titre, auteur, ISBN, résumé, nombre de pages, éditeur, date d'édition, cote, localisation, état) même si vous ne vouliez que le titre et l'auteur pour une simple liste.
+    \item \textbf{GraphQL} = vous remplissez un bon de consultation précis : ``Je veux uniquement le titre et le nom de l'auteur du livre n°123.'' Le bibliothécaire ne vous remet que ces deux informations.
+\end{itemize}
+\end{analogybox}
+
+\subsubsection{Impact Technique}
+
+\begin{itemize}[leftmargin=1.5cm]
+    \item \textbf{Réduction du payload} : le JSON retourné ne contient que les champs demandés, réduisant la taille de la réponse de 30\% à 80\% selon les cas.
+    \item \textbf{Économie de bande passante} : crucial pour les applications mobiles en 3G/4G.
+    \item \textbf{Moins de parsing côté client} : le client n'a pas à ignorer des champs inutiles.
+\end{itemize}
+
+\subsection{Comment GraphQL élimine l'Under-fetching}
+
+\begin{infobox}[title={Définition : Under-fetching}]
+L'\textbf{under-fetching} se produit lorsqu'une seule requête ne suffit pas à obtenir toutes les données nécessaires. Avec REST, afficher un livre avec son auteur et les 3 derniers emprunts nécessite 3 requêtes HTTP distinctes.
+\end{infobox}
+
+\subsubsection{Mécanisme de GraphQL}
+
+GraphQL permet de \textbf{naviguer dans les relations} entre entités en une seule requête. Le client demande un arbre complet de données liées, et le serveur le résout en un seul aller-retour réseau.
+
+\begin{analogybox}
+Imaginez que vous préparez un \textbf{rapport de gestion pour une bibliothèque} :
+\begin{itemize}
+    \item \textbf{REST} = vous devez aller chercher la fiche du livre au catalogue, puis la fiche de l'auteur au service documentation, puis l'historique des emprunts au service prêt. \textbf{3 déplacements} dans 3 services différents.
+    \item \textbf{GraphQL} = vous remplissez un formulaire unique demandant : titre du livre, nom de l'auteur, et les 3 derniers emprunts (date, nom de l'emprunteur). Un \textbf{seul déplacement}, et le système rassemble tout pour vous.
+\end{itemize}
+\end{analogybox}
+
+\subsubsection{Impact Technique}
+
+\begin{itemize}[leftmargin=1.5cm]
+    \item \textbf{Single round-trip} : une seule requête HTTP remplace N requêtes REST.
+    \item \textbf{Réduction de la latence} : suppression du temps d'attente entre les appels successifs.
+    \item \textbf{Atomicité logique} : toutes les données liées sont cohérentes (même snapshot temporel).
+\end{itemize}
+
+\newpage
+
+% ============================================================
+% SECTION ILLUSTRATIONS VISUELLES -- IMAGES SQUID GAME
+% ============================================================
+\section{Illustrations Visuelles : La Métaphore Squid Game}
+
+Cette section utilise deux images emblématiques de la série \textit{Squid Game} pour illustrer de manière percutante la différence fondamentale entre les paradigmes REST et GraphQL.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{Lee-Jung-jae-la-star-de-Squid-Game-1141480.jpg}
+    \caption{\textbf{L'API REST} :  Le sourire du Joueur 456 illustre métaphoriquement la séduction apparente de l'architecture REST : une interface intuitive et accessible en surface, qui dissimule pourtant des limitations structurelles profondes. À l'instar de ce personnage qui avance avec optimisme dans un environnement hostile, REST répond aux requêtes avec une générosité non contrôlée — exposant le client à des phénomènes d'over-fetching (réception de données superflues) et d'under-fetching (nécessité de multiplier les appels), au détriment des performances applicatives.}
+    \label{fig:rest}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.56\textwidth]{telechargement.png}
+    \caption{\textbf{L'API GraphQL} : Le regard déterminé et concentré du Joueur 456 traduit l'essence même de GraphQL : une approche rigoureuse, maîtrisée et orientée résultat. Contrairement à REST, GraphQL confère au client un contrôle total sur la structure et le volume des données retournées, via un unique point d'entrée et un langage de requête déclaratif. Cette figure symbolise ainsi le passage d'une logique de disponibilité passive à une logique d'efficience active dans la communication client-serveur. }
+    \label{fig:graphql}
+\end{figure}
+
+% ========================
+% PARTIE 4 : SPRING BOOT
+% ========================
+
+\section{Choix d'Architecture dans un Projet Spring Boot}
+
+\begin{table}[H]
+\centering
+\rowcolors{2}{tableodd}{tableeven}
+\begin{tabular}{@{}L{7cm}L{8cm}@{}}
+\toprule
+\rowcolor{tableheader}
+\textcolor{white}{\textbf{Scénario}} & \textcolor{white}{\textbf{Recommandation}} \\
+\midrule
+API simple, CRUD standard, cache HTTP critique & \textbf{REST} \\
+Application mobile (bande passante limitée) & \textbf{GraphQL} (élimine l'over-fetching) \\
+Dashboard avec données liées complexes & \textbf{GraphQL} (élimine l'under-fetching) \\
+Microservices avec agrégation multi-sources & \textbf{GraphQL} (fédération de schémas) \\
+Système legacy, interopérabilité maximale & \textbf{REST} \\
+\bottomrule
+\end{tabular}
+\caption{Guide de Choix d'Architecture}
+\end{table}
+
+\newpage
+
+% ========================
+% TABLEAU RÉCAPITULATIF
+% ========================
+\section{Tableau Récapitulatif Comparatif}
+
+\begin{longtable}{@{}L{4cm}L{5.5cm}L{5.5cm}@{}}
+\caption{Tableau Récapitulatif Complet REST vs GraphQL} \\
+
+\toprule
+\rowcolor{tableheader}
+\textcolor{white}{\textbf{Critère}} & \textcolor{white}{\textbf{REST}} & \textcolor{white}{\textbf{GraphQL}} \\
+\midrule
+\endfirsthead
+
+\multicolumn{3}{c}{\tablename\ \thetable{} -- Suite} \\
+\toprule
+\rowcolor{tableheader}
+\textcolor{white}{\textbf{Critère}} & \textcolor{white}{\textbf{REST}} & \textcolor{white}{\textbf{GraphQL}} \\
+\midrule
+\endhead
+
+\midrule
+\multicolumn{3}{r}{\textit{Suite à la page suivante}} \\
+\endfoot
+
+\bottomrule
+\endlastfoot
+
+\textbf{Over-fetching} & Inévitable (réponse fixe) & \textbf{Éliminé} (client choisit les champs) \\
+\midrule
+\textbf{Under-fetching} & Fréquent (N requêtes) & \textbf{Éliminé} (requête unique imbriquée) \\
+\midrule
+\textbf{Nombre de requêtes} & Multiple pour données liées & Unique pour arbre complet \\
+\midrule
+\textbf{Contrôle des données} & Serveur impose tout & Client contrôle tout \\
+\midrule
+\textbf{Cache HTTP} & Excellent (ETag, Cache-Control) & Complexe (stratégie applicative) \\
+\midrule
+\textbf{Typage} & Faible (JSON schéma optionnel) & Fort (schéma obligatoire) \\
+\midrule
+\textbf{Versionnement} & Nécessaire (\texttt{/v1/}, \texttt{/v2/}) & Non nécessaire (évolution continue) \\
+\midrule
+\textbf{Documentation} & OpenAPI/Swagger (externe) & Introspection (native) \\
+\midrule
+\textbf{Complexité serveur} & Modérée & Élevée (resolvers, validation) \\
+\midrule
+\textbf{Complexité client} & Élevée (orchestration N calls) & Faible (requête structurée unique) \\
+\midrule
+\textbf{Cas d'usage idéal} & API simples, cache-intensive & Apps mobiles, données liées complexes \\
+
+\end{longtable}
+
+\newpage
+
+% ========================
+% CONCLUSION
+% ========================
+\section{Conclusion}
+
+\subsection{GraphQL : La Réponse aux Limitations de REST}
+
+Ce rapport a démontré de manière concrète que \textbf{GraphQL élimine les deux failles structurelles de REST} :
+
+\begin{enumerate}[leftmargin=1.5cm]
+    \item \textbf{Over-fetching} : en permettant au client de spécifier exactement les champs souhaités, GraphQL réduit le payload de 30\% à 80\%, économisant la bande passante et la mémoire.
+
+    \item \textbf{Under-fetching} : en permettant des requêtes imbriquées sur un arbre complet de données liées, GraphQL remplace N requêtes REST par une seule requête, divisant la latence réseau par N.
+\end{enumerate}
+
+\subsection{Quand choisir l'un ou l'autre ?}
+
+\begin{itemize}
+    \item \textbf{REST} reste pertinent pour les API publiques simples, les systèmes nécessitant un cache HTTP agressif, et les intégrations legacy.
+    \item \textbf{GraphQL} s'impose dès que les données sont liées, que la bande passante est contrainte (mobile), ou que le client a besoin de flexibilité sur la structure des réponses.
+\end{itemize}
+
+\begin{infobox}[title={Mot de la fin}]
+GraphQL ne remplace pas REST -- il \textbf{répond à ses limitations}. Maîtriser les deux paradigmes permet à l'architecte de choisir l'outil adapté à chaque contexte, ou même d'exposer les deux simultanément dans un projet Spring Boot.
+\end{infobox}
+
+\vfill
+\newpage
+
+% ============================================================
+% BIBLIOGRAPHIE ET RÉFÉRENCES
+% ============================================================
+\section*{Bibliographie et Références}
+\addcontentsline{toc}{section}{Bibliographie et Références}
+
+\begin{enumerate}[leftmargin=1.5cm]
+
+    \item \textbf{IBM France} -- \textit{GraphQL et API REST : quelle est la différence} \\
+    IBM Think, 29 mars 2024. \\
+    \url{https://www.ibm.com/fr-fr/think/topics/graphql-vs-rest-api} \\
+    \textit{Source de référence en français décortiquant les différences fondamentales entre REST et GraphQL, notamment la gestion des versions, la récupération des données et la mise en cache.}
+
+    \item \textbf{GraphQL.org} -- \textit{The query language for modern APIs} \\
+    Site officiel de la fondation GraphQL. \\
+    \url{https://graphql.org/} \\
+    \textit{Documentation officielle de GraphQL présentant les concepts fondamentaux : précision, optimisation, productivité, cohérence, évolution sans versionnement.}
+
+    \item \textbf{GeeksforGeeks} -- \textit{Over-Fetching and Under-Fetching} \\
+    GeeksforGeeks, 8 avril 2026. \\
+    \url{https://www.geeksforgeeks.org/graphql/what-are-over-fetching-and-under-fetching/} \\
+    \textit{Explication technique détaillée des concepts d'over-fetching et under-fetching avec exemples concrets et impacts sur les performances réseau.}
+
+    
+
+\end{enumerate}
+
+\begin{enumerate}[leftmargin=1.5cm, resume]
+
+    \item \textbf{Postman} -- \textit{GraphQL vs REST: What's the Difference and When Should You Use Each ?} \\
+    YouTube, 1 avril 2025. \\
+    \url{https://www.youtube.com/watch?v=2wz19HOyu1w} \\
+    \textit{Démonstration live comparant REST et GraphQL avec l'API Star Wars, tests dans Postman, analyse des temps de chargement et scénarios pratiques d'utilisation.}
+
+    
+
+    \item \textbf{IBM} -- \textit{GraphQL vs REST: Which is Better for APIs ?} \\
+    YouTube, 7 avril 2023. \\
+    \url{https://www.youtube.com/watch?v=PTfZcN20fro} \\
+    \textit{Présentation IBM comparant les approches REST et GraphQL pour le développement d'API, avec explication des forces et faiblesses de chaque paradigme.}
+
+    
+    \item \textbf{Philip Starritt} -- \textit{Spring Boot GraphQL Tutorial Series} \\
+    YouTube Playlist. \\
+    \url{https://www.youtube.com/playlist?list=PLFRMfO9abnnDg6RsC_7TIEDiEE79Bnvdp} \\
+    \textit{Série de tutoriels détaillés sur Spring Boot et GraphQL, incluant l'introduction, la configuration, les dépendances et la mise en place de l'IDE.}
+
+
+
+\end{enumerate}
+
+\begin{enumerate}[leftmargin=1.5cm, resume]
+
+    \item \textbf{Spring for GraphQL} -- Documentation officielle \\
+    Spring.io. \\
+    \url{https://spring.io/projects/spring-graphql} \\
+    \textit{Documentation officielle du projet Spring for GraphQL, couvrant l'intégration avec Spring Boot, Spring Security, les transactions et les subscriptions WebSocket.}
+
+\end{enumerate}
+
+\vfill
+
+\begin{center}
+\rule{0.5\textwidth}{0.4pt}
+
+\textit{Fin}
+\end{center}
+\end{document}

@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>REST vs GraphQL — Comparaison</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,200..700,0..1,-50..200"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="bg">
+      <header class="top">
+        <div class="top__left">
+          <div class="kicker">COMPARAISON MONITORING EN TEMPS RÉEL</div>
+          <div class="title">
+            <span class="title__rest">REST</span>
+            <span class="title__vs">VS</span>
+            <span class="title__gql">GRAPHQL</span>
+          </div>
+          <div class="subtitle">Bibliothèque API — Spring Boot 3 + Spring for GraphQL</div>
+        </div>
+
+        <div class="pill" id="livePill" aria-live="polite">
+          <span class="dot" id="liveDot"></span>
+          <span id="liveText">EN DIRECT</span>
+        </div>
+      </header>
+
+      <main class="grid">
+        <!-- REST -->
+        <section class="card card--rest">
+          <div class="card__head">
+            <div class="badge badge--rest">REST</div>
+            <div class="endpoint">
+              <div class="endpoint__method">GET</div>
+              <div class="endpoint__path">/api/livres</div>
+              <div class="endpoint__hint">Récupère tous les champs</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel__title">
+              EXEMPLE DE RÉPONSE (JSON)
+              <span class="muted" id="restFieldsMeta">~0 champs retournés</span>
+            </div>
+            <pre class="code" id="restJson">Chargement…</pre>
+          </div>
+
+          <div class="stats">
+            <div class="stat">
+              <div class="stat__label">TAILLE RÉPONSE</div>
+              <div class="stat__value" id="restSize">—</div>
+              <div class="stat__meta" id="restSizeMeta">—</div>
+            </div>
+            <div class="stat">
+              <div class="stat__label">TEMPS RÉPONSE</div>
+              <div class="stat__value" id="restTime">—</div>
+              <div class="stat__meta">1 requête HTTP</div>
+            </div>
+            <div class="stat">
+              <div class="stat__label">REQUÊTES DB</div>
+              <div class="stat__value" id="restDb">1 + N</div>
+              <div class="stat__meta">Problème N+1</div>
+            </div>
+          </div>
+
+          <div class="callout callout--rest">
+            <span class="material-symbols-outlined">error</span>
+            <div>
+              <div class="callout__title">Over-fetching : trop de données</div>
+              <div class="callout__desc">On récupère beaucoup plus de champs que nécessaire.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- CENTER COMPARISON -->
+        <section class="compare">
+          <div class="compare__title">COMPARAISON SELON LES BAREMES</div>
+
+          <div class="table">
+            <div class="row head">
+              <div></div>
+              <div class="col rest">REST</div>
+              <div class="col gql">GRAPHQL</div>
+            </div>
+
+            <div class="row">
+              <div class="metric">
+                <span class="material-symbols-outlined">database</span>
+                <span>DONNÉES TRANSFÉRÉES</span>
+              </div>
+              <div class="cell rest">
+                <div class="big" id="restSize2">—</div>
+                <div class="small">Over-fetching</div>
+              </div>
+              <div class="cell gql">
+                <div class="big" id="gqlSize2">—</div>
+                <div class="small">Optimisé</div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="metric">
+                <span class="material-symbols-outlined">schedule</span>
+                <span>TEMPS DE RÉPONSE</span>
+              </div>
+              <div class="cell rest">
+                <div class="big" id="restTime2">—</div>
+                <div class="small">—</div>
+              </div>
+              <div class="cell gql">
+                <div class="big" id="gqlTime2">—</div>
+                <div class="small">—</div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="metric">
+                <span class="material-symbols-outlined">call_split</span>
+                <span>NOMBRE DE REQUÊTES</span>
+              </div>
+              <div class="cell rest">
+                <div class="big">Multi-requêtes</div>
+                <div class="small">Under-fetching</div>
+              </div>
+              <div class="cell gql">
+                <div class="big">1 requête</div>
+                <div class="small">Tout en 1</div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="metric">
+                <span class="material-symbols-outlined">lan</span>
+                <span>REQUÊTES BASE DE DONNÉES</span>
+              </div>
+              <div class="cell rest">
+                <div class="big">1 + N</div>
+                <div class="small">Problème N+1</div>
+              </div>
+              <div class="cell gql">
+                <div class="big">1 + 1</div>
+                <div class="small">Avec DataLoader</div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="metric">
+                <span class="material-symbols-outlined">tune</span>
+                <span>FLEXIBILITÉ</span>
+              </div>
+              <div class="cell rest">
+                <div class="big">Faible</div>
+                <div class="small">Fixe</div>
+              </div>
+              <div class="cell gql">
+                <div class="big">Élevée</div>
+                <div class="small">Sélection de champs</div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="metric">
+                <span class="material-symbols-outlined">bolt</span>
+                <span>TEMPS RÉEL</span>
+              </div>
+              <div class="cell rest">
+                <div class="big">Non</div>
+                <div class="small">Polling requis</div>
+              </div>
+              <div class="cell gql">
+                <div class="big">Oui</div>
+                <div class="small">Subscriptions</div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="metric">
+                <span class="material-symbols-outlined">edit_square</span>
+                <span>MUTATIONS</span>
+              </div>
+              <div class="cell rest">
+                <div class="big">POST/PUT/DELETE</div>
+                <div class="small">Multiples endpoints</div>
+              </div>
+              <div class="cell gql">
+                <div class="big">Natives</div>
+                <div class="small">Type-safe</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- GRAPHQL -->
+        <section class="card card--gql">
+          <div class="card__head">
+            <div class="badge badge--gql">GRAPHQL</div>
+            <div class="endpoint">
+              <div class="endpoint__method">GraphQL</div>
+              <div class="endpoint__path">Sélectionne uniquement les champs nécessaires</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel__title">EXEMPLE DE REQUÊTE</div>
+            <pre class="code" id="gqlQuery">Chargement…</pre>
+            <div class="panel__title panel__title--gap">
+              RÉPONSE (JSON)
+              <span class="muted" id="gqlFieldsMeta">~0 champs retournés</span>
+            </div>
+            <pre class="code" id="gqlJson">Chargement…</pre>
+          </div>
+
+          <div class="stats">
+            <div class="stat">
+              <div class="stat__label">TAILLE RÉPONSE</div>
+              <div class="stat__value" id="gqlSize">—</div>
+              <div class="stat__meta" id="gqlSizeMeta">—</div>
+            </div>
+            <div class="stat">
+              <div class="stat__label">TEMPS RÉPONSE</div>
+              <div class="stat__value" id="gqlTime">—</div>
+              <div class="stat__meta">1 requête HTTP</div>
+            </div>
+            <div class="stat">
+              <div class="stat__label">REQUÊTES DB</div>
+              <div class="stat__value" id="gqlDb">1 + 1</div>
+              <div class="stat__meta">Avec DataLoader</div>
+            </div>
+          </div>
+
+          <div class="callout callout--gql">
+            <span class="material-symbols-outlined">check_circle</span>
+            <div>
+              <div class="callout__title">Pas d'over-fetching, pas d'under-fetching</div>
+              <div class="callout__desc">Réponse calibrée au besoin exact du client.</div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <section class="monitor">
+        <div class="monitor__head">
+          <div class="monitor__title">MONITORING TEMPS RÉEL — SUBSCRIPTIONS GRAPHQL</div>
+          <div class="monitor__status">
+            <div class="status">
+              <div class="status__label">ABONNEMENT ACTIF</div>
+              <div class="status__value" id="subName">livreDisponible(genre: ROMAN)</div>
+            </div>
+            <div class="status">
+              <div class="status__label">WebSocket</div>
+              <div class="status__value">/graphql-ws</div>
+            </div>
+            <div class="status">
+              <div class="status__label">Statut</div>
+              <div class="status__value status__value--ok" id="wsStatus">Connexion…</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline" id="timeline">
+          <!-- events appended here -->
+        </div>
+
+        <div class="tip">
+          <span class="material-symbols-outlined">info</span>
+          <div id="tipText">
+            TIP : Mesurez la différence avec
+            <span class="mono">curl -w "%{size_download}"</span> :
+            REST <span class="mono">/api/livres</span> (tous champs) vs GraphQL (champs sélectionnés).
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script src="./app.js" defer></script>
+  </body>
+</html>
+

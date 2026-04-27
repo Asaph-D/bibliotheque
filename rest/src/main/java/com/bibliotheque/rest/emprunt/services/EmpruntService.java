@@ -3,6 +3,8 @@ package com.bibliotheque.rest.emprunt.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.bibliotheque.rest.api.ConflictException;
+import com.bibliotheque.rest.api.NotFoundException;
 import com.bibliotheque.rest.adherent.entities.Adherent;
 import com.bibliotheque.rest.adherent.repositories.AdherentRepository;
 import com.bibliotheque.rest.emprunt.entities.Emprunt;
@@ -30,13 +32,13 @@ public class EmpruntService {
     
     public Emprunt emprunter(Long livreId, Long adherentId) {
         Livre livre = livreRepository.findById(livreId)
-                .orElseThrow(() -> new RuntimeException("Livre non trouvé"));
+                .orElseThrow(() -> new NotFoundException("Livre non trouvé"));
         
         Adherent adherent = adherentRepository.findById(adherentId)
-                .orElseThrow(() -> new RuntimeException("Adhérent non trouvé"));
+                .orElseThrow(() -> new NotFoundException("Adhérent non trouvé"));
         
         if (!livre.getDisponible()) {
-            throw new RuntimeException("Le livre n'est pas disponible");
+            throw new ConflictException("Le livre n'est pas disponible");
         }
         
         Emprunt emprunt = new Emprunt();
@@ -52,7 +54,7 @@ public class EmpruntService {
     
     public Emprunt retourner(Long empruntId) {
         Emprunt emprunt = empruntRepository.findById(empruntId)
-                .orElseThrow(() -> new RuntimeException("Emprunt non trouvé"));
+                .orElseThrow(() -> new NotFoundException("Emprunt non trouvé"));
         
         emprunt.setDateRetourEffective(LocalDate.now());
         livreService.markAsAvailable(emprunt.getLivre().getId());

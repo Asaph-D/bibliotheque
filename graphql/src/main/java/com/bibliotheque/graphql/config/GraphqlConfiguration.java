@@ -23,7 +23,12 @@ public class GraphqlConfiguration {
     private DataFetcher<Object> auteurDataFetcher() {
         return environment -> {
             DataLoader<Long, Object> loader = environment.getDataLoader("auteurs");
-            Long auteurId = environment.<Livre>getSource().getAuteurId();
+            Livre livre = environment.getSource();
+            // Fallback: si le DataLoader n'est pas enregistré, utiliser la relation JPA directement.
+            if (loader == null) {
+                return livre.getAuteur();
+            }
+            Long auteurId = livre.getAuteurId();
             return loader.load(auteurId); // batch automatique
         };
     }
